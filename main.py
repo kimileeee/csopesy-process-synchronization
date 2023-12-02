@@ -1,21 +1,19 @@
 import threading
-import time
+import random
 from fitting_room import run_thread, FittingRoom
 
 def simulate_fitting_room(n, b, g):
     fittingroom = FittingRoom(n)
     threads = []
 
-    for i in range(b):
-        threads.append(threading.Thread(target=run_thread, args=(fittingroom.BLUE+str(i), fittingroom.BLUE, fittingroom)))
+    blue_threads = [threading.Thread(target=run_thread, args=(i, 'blue', fittingroom)) for i in range(b)]
+    green_threads = [threading.Thread(target=run_thread, args=(i, 'green', fittingroom)) for i in range(g)]
 
-    for i in range(g):
-        threads.append(threading.Thread(target=run_thread, args=(fittingroom.GREEN+str(i), fittingroom.GREEN, fittingroom)))
-
-    for thread in threads:
+    all_threads = blue_threads + green_threads
+    for thread in all_threads:
         thread.start()
 
-    for thread in threads:
+    for thread in all_threads:
         thread.join()
 
 if __name__ == "__main__":
