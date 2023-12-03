@@ -1,8 +1,5 @@
-import threading
-import random
 from FittingRoom import FittingRoom
 from CustomThread import BlueThread, GreenThread
-# from FittingRoomNew import FittingRoom
 
 def simulate_fitting_room(n, b, g):
     
@@ -24,18 +21,19 @@ def simulate_fitting_room(n, b, g):
 
 
 if __name__ == "__main__":
-    # while True:
-    #     n = int(input("Number of slots: "))
-    #     b = int(input("Number of blue threads: "))
-    #     g = int(input("Number of green threads: "))
+    while True:
+        n = int(input("Number of slots: "))
+        b = int(input("Number of blue threads: "))
+        g = int(input("Number of green threads: "))
         
-    #     if (n > 0 and b >= 0 and g >= 0):
-    #         break
-    #     else:
-    #         print("Invalid input.")
+        if (n > 0 and b >= 0 and g >= 0):
+            break
+        else:
+            print("Invalid input.")
 
+    # Test cases
     # n, b, g = 5, 10, 7
-    n, b, g = 5, 10, 0
+    # n, b, g = 5, 10, 0
     # n, b, g = 5, 0, 7
 
     if (b==0 and g==0):

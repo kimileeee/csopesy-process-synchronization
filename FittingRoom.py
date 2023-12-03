@@ -1,6 +1,5 @@
 import threading
 import time
-import random
 
 class FittingRoom:
     def __init__(self, n):
