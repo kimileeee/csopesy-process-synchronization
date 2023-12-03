@@ -3,32 +3,32 @@ import time
 import random
 
 class FittingRoom:
-    BLUE = 'blue'
-    GREEN = 'green'
-
     def __init__(self, n):
         self.n_slots = n
         self.slots = threading.Semaphore(n)
         self.mutex = threading.Semaphore(1)
         self.turnstile = threading.Semaphore(1)
         self.current_color = None
+        self.running_threads = []
 
-    def enter_fitting_room(self, id, color):
-        # Thread will keep trying to enter the fitting room until it succeeds
+    def enter_fitting_room(self, thread):
+        self.running_threads.append(thread)
         while True:
             self.mutex.acquire()
             if self.current_color is None: # First thread to enter
-                self.current_color = color
-                print(f"{self.current_color.capitalize()} only")
+                self.current_color = thread.color
+                print(f"------------ {self.current_color.capitalize()} only ------------")
                 self.slots.acquire()
-                print(f"Thread {id} ({color}) entered the fitting room.")
+                print(f"+ ENTR: Thread {thread.id} ({thread.color})")
                 self.mutex.release()
                 break
 
-            elif self.current_color == color:
+            elif self.current_color == thread.color:
                 if self.slots._value > 0 and self.turnstile._value:
+                    # if self.slots._value == 0:
+                    #     print(f"------------ {self.current_color.capitalize()} only ------------")
                     self.slots.acquire()
-                    print(f"Thread {id} ({color}) entered the fitting room.")
+                    print(f"+ ENTR: Thread {thread.id} ({thread.color})")
                     self.mutex.release()
                     break
                 else:
@@ -39,21 +39,18 @@ class FittingRoom:
             self.mutex.release()
             time.sleep(1)
 
-
-    def exit_fitting_room(self, id, color):
+    def exit_fitting_room(self, thread):
         self.mutex.acquire()
         self.slots.release()
-        print(f"----------EXIT: Thread {id}")
+        self.running_threads.remove(thread)
+        print(f"- EXIT: Thread {thread.id} ({thread.color})")
         if self.slots._value == self.n_slots:
-            print("Empty fitting room.")
-            # self.current_color = None
+            print("------- Empty fitting room -------")
+            for t in self.running_threads:
+                if t.color != self.current_color:
+                    self.current_color = t.color
+                    print(f"------------ {self.current_color.capitalize()} only ------------")
+                    break
             self.turnstile.release()
-            self.current_color = self.GREEN if self.current_color == self.BLUE else self.BLUE
             
         self.mutex.release()
-
-
-def run_thread(id, color, fittingroom):
-    fittingroom.enter_fitting_room(id, color)
-    time.sleep(random.uniform(1, 5))
-    fittingroom.exit_fitting_room(id, color)
